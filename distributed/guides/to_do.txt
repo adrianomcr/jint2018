@@ -1,0 +1,45 @@
+
+
+PopAllNodes
+When a robot pops all nodes it shold not be able to replan in a meeting. Currently we are placing every edge back to e_uv, but maybe it s better to only runn CPP again for all nodes.
+
+
+
+
+***!!!!!!!!!************
+OBS:
+When, inside the 'sensor_simulator', we update the History of the robots in a meeting in the variable 'HL' this imformation is not updated in the list of histry H_all, which is obtainned from the callback. This occurs because the robots spend some time recomputing the new plann and finnishing the edges in order to accept the new plan, which contains the new history with the new lastMeetng informaion.
+************!!!!!!!!!***
+
+
+Redefine when the robot ends a search and when in POP all nodes - DONE
+
+
+Do replanning only if the robot has not popped all nodes yet. And pop all nodes only if the robot is not "finnishing an edge".
+One thing that can be done is if only one robot has popped all nodes, then they share all nodes but disregard the popped ones. This would complicate things
+Use the available variable only for after popping all nodes
+Use the 
+
+Generalize the cost computation in the comparison of new plan. - DONE
+
+
+Prevent a robot from searching on search points when it receives a new plan and is finishing an edge
+"THE PROBLEM WITH THIS IS THAT THE MINIMUM ID ROBOT WILL KEEP SERACHING THE SPs THAT WERE ALREADY SEARCHED BY THE MAX ID ROBOT"
+MAYBE CREATE A LIST OF FORBIDEN SEARCH POINTS
+
+
+When in a communication graph the robots may be continuously sharing the set of unvisited nodes. In this way the robots may search in less nodes when they "pop all EDGES"
+
+
+Solve the problem with the pylab library.
+
+
+
+
+
+POP ALL EDGES ONLY IF NOT WAINTTING FOR A NEW PLAN BROADCAST
+
+MAYBE, AFERER POOPING ALL EGDGES THE ROBOT MAY PARTICIPATE IN A COMM GRAPH, WITHOUT INCLUDING ANY OF THE POPPED EDGES
+
+
+PROBLEM OF THE DEPOT POINTS !!!!!!!!!!!!!!!!!

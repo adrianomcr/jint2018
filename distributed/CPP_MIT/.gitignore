@@ -1,0 +1,10 @@
+*.iml
+*.ipr
+*.iws
+*.csv
+*.gpx
+*.pyc
+*.osm
+*~
+
+resources.py

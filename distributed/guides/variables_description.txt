@@ -1,0 +1,30 @@
+
+
+
+HolePath: Python list of nodes of the original graph that must be reached in order by the robot. Nodes may repeat, specially if the graph is not Eulerian.
+pathNode: Sequence of nodes connecting two nodes of the graph
+
+History():
+id: id of the robot
+specs: [Vd, Vs] forward velocity (Vd), and search velocity (Vs)
+e_v:
+e_uv:
+e_g:
+T_a:
+T_f:
+currEdge:
+nextNode:
+pose:
+lastMeeting:
+abort_curr_edge: this bool variable is set True after a replanning 
+available: this bool variable is True when the robot is available for participating in a raplanning. It is False when waitting for finishing an edge and when already popped all nodes
+
+
+waitting_new_plan: Bool variable that is true when a robot met someone and is now waiting a new plan
+replan_tasks: 
+
+
+
+
+new_path: 1 if the robot ended an edge between two directly connectd nodes
+new_task: 1 if the robot ended the last edge of a concatenated edge between two indirectly connected nodes

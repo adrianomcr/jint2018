@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<launch>
+
+
+<node pkg = "stage_ros" name = "stageros" type = "stageros" output = "screen" args="-d $(find distributed)/worlds/map_test.world">
+</node>
+
+<!--node pkg = "rviz" name = "rviz" type = "rviz" args="-d $(find distributed)/rviz/rviz_config_3r.rviz" output="screen">
+</node-->
+
+<!--node pkg = "distributed" name = "config_node" type = "config_3r.py" output="screen" args="9">
+</node-->
+
+<!--node pkg = "map_server" name = "map_server" type = "map_server" args="$(find distributed)/maps/map_36_GVD.yaml" output="screen">
+</node-->
+
+
+<node pkg = "distributed" name = "test_coll" type = "test_collision.py" args="0" output="screen">
+</node>
+
+
+<!--node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster_0" args="0 0 0 0 0 0 world robot_0/odom 10" /-->
+<!--node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster_1" args="0 0 0 0 0 0 world robot_1/odom 10" /-->
+<!--node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster_2" args="0 0 0 0 0 0 world robot_2/odom 10" /-->
+
+
+
+</launch>
