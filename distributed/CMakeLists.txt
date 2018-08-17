@@ -58,6 +58,7 @@ add_message_files(
   History.msg
   HistList.msg
   Broadcast.msg
+  ForbEdges.msg
 )
 
 ## Generate services in the 'srv' folder

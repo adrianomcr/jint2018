@@ -78,7 +78,7 @@ def find_cluster(list_tree,id,level):
 
 # Here the script begins ----------  ----------
 # ----------  ----------  ----------  ----------
-n = 180 #number of nodes
+n = 150 #number of nodes
 m = n * (n - 1) #number of edges
 iterations = 3 #number of times the LP is going to run
 

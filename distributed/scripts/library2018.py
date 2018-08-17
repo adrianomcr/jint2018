@@ -11,12 +11,12 @@ from lp_maker import *
 import rospkg
 import scipy.io
 import copy
+from geometry_msgs.msg import Twist
 
 import sys
 rp = rospkg.RosPack()
 path = rp.get_path('distributed')
-path = path + '/CPP_MIT'
-sys.path.insert(0, path)
+sys.path.insert(0, path + '/CPP_MIT')
 import postman as CPPlib
 import MST
 
@@ -308,7 +308,7 @@ def pop_all_edges(H):
 
 
 
-def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge,pop_all_edges_flag):
+def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge,pop_all_edges_flag, pub_stage):
 
     C = original_graph['C']
     PathM = original_graph['PathM']
@@ -351,7 +351,7 @@ def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, 
             H['available'] = False
             for kk in range(len(PolC[0])):
                 print kk+1,'/',len(PolC[0])
-                if not (kk + 1 in H['e_v']):
+                if not (kk + 1 in H['e_v']) and not (kk + 1 in H['T_f']):
                     H['e_uv'].append(kk + 1)
                     print kk + 1, '/', len(PolC[0]), ' included'
                 else:
@@ -368,6 +368,8 @@ def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, 
             curr_node, lixo = get_current_node(original_graph,pose)
             curr_node = curr_node+1
             print 'Here is curr_node', curr_node
+            vel = Twist()
+            pub_stage.publish(vel)
             connected_subgraph = MST.MSTconnect(original_graph,H['e_uv'], curr_node, 'k', False)
             edges_listOfTuples = write_listOfTuples(original_graph, connected_subgraph)
             Hole_path = CPPlib.main_CPP(sorted(edges_listOfTuples), curr_node)
@@ -410,6 +412,8 @@ def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, 
                 FILE = open(path, 'a')
                 FILE.write(str(edge)+'\n')
                 FILE.close()
+            if not edge in H['T_f']:
+                H['T_f'].append(edge)
 
 
         #Print information on screen

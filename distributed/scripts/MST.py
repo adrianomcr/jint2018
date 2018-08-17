@@ -127,7 +127,8 @@ def MSTconnect(graph,edgeset_all, robot_start_node, cor, PLOT_IT):
             if  e+1 in  final_list:
                 pylab.plot(x, y, cor, linewidth=3.0)
             else:
-                pylab.plot(x, y, 'k--', linewidth=1.0)
+                #pylab.plot(x, y, 'k--', linewidth=1.0)
+                pylab.plot(x, y, 'k-', linewidth=1.0)
         # pylab.show()
         # ----------  ----------  ---------- ----------
 

@@ -293,13 +293,6 @@ def config():
 
     i = 0
 
-    vel.linear.x = 0
-    vel.linear.y = 0
-    vel.linear.z = 0
-    vel.angular.x = 0
-    vel.angular.y = 0
-    vel.angular.z = 0
-
     pub_pose = rospy.Publisher("/marker_pose", Marker, queue_size=1)
     pub_pose1 = rospy.Publisher("/marker_pose1", Marker, queue_size=1)
     pub_circ0 = rospy.Publisher("/marker_circ0", MarkerArray, queue_size=1)
@@ -317,7 +310,10 @@ def config():
     rate = rospy.Rate(freq)
 
     p = [2*pi*i/50.0 for i in range(50)]
-    R = 2.5
+
+    R = rospy.get_param('DIST_INTO')
+
+    #R = 2.5
     #circ_x0 = np.matrix([R*cos(i) for i in p])
     #circ_y0 = np.matrix([R*sin(i) for i in p])
     circ_x0 = [R*cos(i) for i in p]

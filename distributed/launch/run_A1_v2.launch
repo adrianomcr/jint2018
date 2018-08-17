@@ -7,8 +7,8 @@
 <rosparam>
   NUM_OF_ROBOTS: 3
   EXP_NAME: "expA1"
-  DIST_INTO: 2.5
-  DIST_LEAVE: 3.5
+  DIST_INTO: 3.5
+  DIST_LEAVE: 4.0
 </rosparam>
 
 
@@ -45,6 +45,8 @@
 <node pkg = "distributed" name = "time_couter" type = "Count_time.py" args="37" output="screen">
 </node>
 
+<!--node pkg = "distributed" name = "histogram" type = "histVisitation.py" args="3 81" output="screen">
+</node-->
 <node pkg = "distributed" name = "histogram" type = "histVisitation.py" args="3 81" output="screen">
 </node>
 

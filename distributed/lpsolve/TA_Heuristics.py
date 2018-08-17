@@ -26,6 +26,9 @@ import LP_function as LP
 
 # Recursive function to find the cluster each node belongs  ----------  ----------
 def find_cluster(list_tree,id,level):
+
+
+
     matriz = list_tree[level]
     if (matriz[id][1] == -1):
         result = matriz[id][0]
@@ -105,6 +108,9 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id):
 
         TA_time = time.time()
 
+
+        #"""
+        # First heuristics to compute the costs
         if iterations == 1:
             mean_speeds = float(sum(speeds))/len(speeds)
             mean_search_speeds = float(sum(search_speeds)) / len(search_speeds)
@@ -119,7 +125,27 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id):
             for i in range(n):
                 for j in range(n):
                     CostM[i][j] = sqrt((pts[i][0] - pts[j][0]) ** 2 + (pts[i][1] - pts[j][1]) ** 2)
-
+        #"""
+        """
+        # First heuristics to compute the costs
+        if iterations == 1:
+            mean_speeds = float(sum(speeds))/len(speeds)
+            mean_search_speeds = float(sum(search_speeds)) / len(search_speeds)
+            CostM = [[0 for i in range(n)] for j in range(n)]
+            for i in range(n):
+                for j in range(n):
+                    CostM[i][j] = C[i][j]/mean_speeds + Csp[i][j]/mean_search_speeds
+                    #CostM[i][j] = sqrt((pts[i][0] - pts[j][0]) ** 2 + (pts[i][1] - pts[j][1]) ** 2)
+        else:
+            CostM = [[0 for i in range(n)] for j in range(n)]
+            #Heuristics: Euclidian distance
+            for i in range(n):
+                ii = inverse_cluster[i][0]
+                for j in range(n):
+                    jj = inverse_cluster[j][0]
+                    #CostM[i][j] = sqrt((pts[i][0] - pts[j][0]) ** 2 + (pts[i][1] - pts[j][1]) ** 2)
+                    CostM[i][j] = C[ii][jj] / mean_speeds + Csp[ii][jj] / mean_search_speeds
+        """
 
 
         tour = LP.execute_lp(pts, CostM, example_colors[run], PLOT)
@@ -149,9 +175,31 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id):
             cy = cy / len(G[clu])
             new_pts.append([cx, cy])
 
+
         pts = new_pts
 
         list_tree.append(matriz)
+
+        """
+        import copy
+        temp_list_tree = copy.deepcopy(list_tree)
+        n = len(pts)
+        matriz = []
+        for k in range(n):
+            matriz.append([k, -1])
+        temp_list_tree.append(matriz)
+        temp_cluster = []
+        print 'temp_list_tree: ', temp_list_tree
+        for k in range(len(pts_0)):
+            cluster_of_k = find_cluster(temp_list_tree, k, 0)
+            temp_cluster.append([k, cluster_of_k])
+        inverse_cluster = [[] for k in range(len(G))]
+        for k in range(len(pts_0)):
+            inverse_cluster[temp_cluster[k][1]].append(k)
+
+        print '\nHere is inverse_cluster: ', inverse_cluster,
+        print '\nHere is temp_cluster: ', temp_cluster, '\n--------------------------------------'
+        """
 
     count_time = time.time() - count_time
 
@@ -175,6 +223,8 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id):
         cluster_of_k = find_cluster(list_tree, k, 0)
         final_cluster.append([k, cluster_of_k])
 
+    #print '\nHere is final_cluster: ', final_cluster, '\n--------------------------------------'
+
     #Here we will apply the simple task assignment to associate agents to clusters
 
     n_clusters = 0
@@ -183,8 +233,7 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id):
             n_clusters = final_cluster[k][1]
     n_clusters = n_clusters + 1
 
-    print 'Here is final cluster:\n', final_cluster
-
+    #print 'Here is final cluster:\n', final_cluster
 
     C_edge_len, C_edge_sp = compute_cluster_costs(original_graph, pts_id)
     Power_robot_len = speeds

@@ -4,7 +4,9 @@ clear all; clc;
 
 % Choose which graph to use
 % NAME = '35';
-NAME = 'A1';
+% NAME = 'A1';
+NAME = 'A2';
+% NAME = 'B1';
 
 
 fig = imread(sprintf('./pixel_files/Map%s.jpg',NAME));
@@ -308,3 +310,25 @@ figure(2)
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.4, 0.4, 0.5, 0.5]);
 
 
+
+
+
+% M = imread('./MAP2GRAPH/FinalVersion/MapA2.jpg');
+% M = M(:,:,1)/3 + M(:,:,2)/3 + M(:,:,3)/3;
+% for i = 1:1:length(M(:,1,1))
+%     for j = 1:1:length(M(1,:,1))
+%         if M(i,j) >= 128
+%             M(i,j) = 255;
+%         else
+%             M(i,j) = 0;
+%         end
+%     end
+% end
+% Mnew(:,:,1) = M;
+% Mnew(:,:,2) = M;
+% Mnew(:,:,3) = M;
+% % imwrite(Mnew,'./MAP2GRAPH/FinalVersion/MapA2_new.png','PNG');
+% imwrite(Mnew,'./MAP2GRAPH/FinalVersion/MapA2_new.jpg','JPG','Quality',100);
+
+        
+        

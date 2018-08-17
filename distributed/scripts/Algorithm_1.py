@@ -5,7 +5,7 @@ from geometry_msgs.msg import Twist, Point
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
 from visualization_msgs.msg import Marker, MarkerArray
-from distributed.msg import History, HistList, Broadcast, Intlist
+from distributed.msg import History, HistList, Broadcast, Intlist, ForbEdges
 from std_msgs.msg import Int16
 from math import sqrt, atan2, exp, atan, cos, sin, acos, pi, asin, atan2
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
@@ -101,7 +101,7 @@ def callback_laser(data):
 
 # Callback routine to obtain data from the sensor simulator
 # Here is were the robot wth minimum id calls the replanning function
-def callback_comm_graph(data):
+def callback_comm_graph_BAK(data):
     # This function recieves messages from the centralized sensor simulator
 
     global list_of_H, list_of_robs, list_of_vels, H
@@ -178,6 +178,113 @@ def callback_comm_graph(data):
 
 
 
+# Callback routine to obtain data from the sensor simulator
+# Here is were the robot wth minimum id calls the replanning function
+def callback_comm_graph(data):
+    # This function recieves messages from the centralized sensor simulator
+
+    global list_of_H, list_of_robs, list_of_vels, H
+    global replan_tasks, finish_edge, id
+    global vel, pub_stage, pub_broadcast, change_plan, Hole_path_list, new_Hists, original_graph, virtual_graph, list_of_H, list_of_robs
+    global count
+    global stop_the_robot
+    global waitting_new_plan
+    global new_plan_flag
+    global pub_hist
+    global edge, pathNode
+
+    R = len(data.listOfH)
+    ids = []
+    for r in range(R):
+        ids.append(data.listOfH[r].id)
+
+    #If this robot is involved in the communication graph
+    if id in ids:
+
+        # Uptate lastMeeting from now
+        list_of_robs = data.robList
+        H['lastMeeting'] = list(list_of_robs)
+
+
+        #Publish the History to the centralized communication simulator in order to keep it actualized
+        Hmsg = History()
+        Hmsg.id, Hmsg.specs, Hmsg.e_v, Hmsg.e_uv, Hmsg.e_g, Hmsg.T_a, Hmsg.T_f, Hmsg.currEdge, Hmsg.nextNode, Hmsg.pose, Hmsg.lastMeeting, Hmsg.abort_curr_edge = id, [Vd, Vs], H['e_v'], H['e_uv'], H['e_g'], H['T_a'], H['T_f'], edge, pathNode[0], pose, H['lastMeeting'], False
+        Hmsg.Whole_path = Hole_path
+        H['available'] = False
+        Hmsg.available = H['available']
+        pub_hist.publish(Hmsg)
+
+
+
+
+        # If some positive change (which adds information) happend in the communication graph
+        if data.comGraphEvent == True:
+            replan_tasks = True
+            finish_edge = False
+            list_of_H = data.listOfH
+
+            print '\n          ---------- Communication graph event received ----------\n'
+            print 'Finishing Edge ...'
+
+
+        stop_the_robot = False
+
+
+        # Compute the new routes if the current robot has munimum index
+        if (id == min(list_of_robs)):
+            # Stop the robot
+            VX, WZ = 0, 0
+            vel.linear.x, vel.angular.z = VX, WZ
+            pub_stage.publish(vel)
+
+            #Flag to stop the robot while it is computting a replan
+            stop_the_robot = True
+
+            # Call the replanning function (Algorithm 2) ----------  ----------  ----------
+            #Old replanning method
+            #change_plan, Hole_path_list, new_Hists = Alg2.replanning(original_graph, virtual_graph, list_of_H)
+
+            # New (better) replanning method
+            change_plan, Hole_path_list, new_Hists = Alg2.replanning_heuristics(original_graph, virtual_graph, list_of_H)
+            # ----------  ----------  ----------  ----------  ----------  ----------  ----------
+
+
+            #Broadcast new plan to other robots
+            print '\nCreating Broadcast message ...\n'
+            B = Broadcast()
+            B.sender = id
+            R = len(new_Hists)
+            B.destinations = []
+            for r in range(R):
+                B.destinations.append(new_Hists[r].id)
+            for r in range(R):
+                IL = Intlist()
+                IL.data = list(Hole_path_list[r])
+                B.new_Hole_paths.append(IL)
+            B.listOfH = new_Hists
+
+            pub_broadcast.publish(B)
+            print 'New plan broadcasted'
+
+            stop_the_robot = False
+
+            # -----------------------------------------------
+
+    return
+# ----------  ----------  ----------  ----------  ----------
+
+# ----------  ----------  ----------  ----------  ----------
+def call_replanning():
+    return
+# ----------  ----------  ----------  ----------  ----------
+
+
+
+
+
+
+
+
 # Callback function to receive a new plan
 def callback_new_plan(data):
 
@@ -202,12 +309,12 @@ def callback_new_plan(data):
         H_new['e_uv'] = list(Hmsg.e_uv)
         H_new['e_g'] = list(Hmsg.e_g)
         H_new['T_a'] = list(Hmsg.T_a)
-        H_new['T_f'] = list(Hmsg.T_f)
+        #H_new['T_f'] = list(Hmsg.T_f)
         H_new['lastMeeting'] = list(Hmsg.lastMeeting)
 
         global abort_curr_edge
         abort_curr_edge = Hmsg.abort_curr_edge
-        print 'Here is abort_curr_edge: ', abort_curr_edge
+        #print 'Here is abort_curr_edge: ', abort_curr_edge
 
 
         print '\n     ----- New plan received -----'
@@ -224,6 +331,22 @@ def callback_new_plan(data):
 
 
 
+# Callback function to receive a new plan
+def callback_ForbEdges(data):
+
+    global id
+    global H
+    global T_f_last
+
+    if id in list(data.destinations):
+        #print '\ndata:\n', data,'\n'
+        H['T_f'] = list(data.forbiden_Edges)
+        T_f_last = copy.deepcopy(H['T_f'])
+
+    return
+# ----------  ----------  ----------  ----------  ----------
+
+
 
 
 
@@ -231,7 +354,7 @@ def callback_new_plan(data):
 def Algorithm_1():
 
     global pose
-    global pub_rviz, pub_targ, pub_pose
+    global pub_rviz, pub_targ, pub_pose, pub_hist
     global freq
     global time, i
     global file_vel
@@ -250,6 +373,7 @@ def Algorithm_1():
     global SP, SP_fix
     global new_plan_flag
     global vel, pub_stage, pub_broadcast, change_plan, Hole_path_list, new_Hists, original_graph, virtual_graph, list_of_H, list_of_robs
+    global edge, pathNode
 
     new_plan_flag = False
 
@@ -257,6 +381,11 @@ def Algorithm_1():
     abort_curr_edge = False
 
     vel = Twist()
+
+    T_f_msg = ForbEdges()
+
+    #print 'T_f_msg:\n', T_f_msg
+    T_f_last = []
 
     global count
     count = 0
@@ -273,6 +402,9 @@ def Algorithm_1():
     my_str = '/robot_' + str(id) + '/base_scan'
     rospy.Subscriber(my_str, LaserScan, callback_laser) #Subscribe to obtain robot's lasr scanner data
     rospy.Subscriber("/comm_graph", HistList, callback_comm_graph) #Subscribe to eventually receive communication graph event (other robots close)
+
+    pub_forb = rospy.Publisher('/forb_edges', ForbEdges, queue_size=10)  # Publish the visited edges to be shared always as possible
+    rospy.Subscriber("/forb_edges", ForbEdges, callback_ForbEdges)
 
     #Read and Write in the new plan topic
     pub_broadcast = rospy.Publisher('/new_path_topic', Broadcast, queue_size=4) #Eventually publish new routes to other robots
@@ -366,18 +498,20 @@ def Algorithm_1():
     #Main loop
     while not rospy.is_shutdown():
 
+        #if not stop_the_robot:
         count = count + 1 #counter
+        #print 'count: ', count
 
         time = count / float(freq) #variable that counts time
 
         # If there is no need to do replanning, just keep moving through the current edge
         if not replan_tasks:
-            [H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag] = myLib.keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pop_all_edges_flag)
+            [H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag] = myLib.keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pop_all_edges_flag, pub_stage)
         # If it is necessary to do replanning ...
         else:
             # First, just keep moving through the current edge only to finish it
             if(not finish_edge):
-                [H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag] = myLib.keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pop_all_edges_flag)
+                [H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag] = myLib.keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pop_all_edges_flag, pub_stage)
                 if change_edge:
                     finish_edge = True
                     print '\nEdge finished\n\nWaitting new plan broadcast\n'
@@ -421,6 +555,9 @@ def Algorithm_1():
         if not stop_the_robot:
             vel.linear.x, vel.angular.z = VX, WZ
             pub_stage.publish(vel)
+        else:
+            while stop_the_robot:
+                rate.sleep()
 
 
         #Write the computed velocities to a txt file
@@ -441,11 +578,31 @@ def Algorithm_1():
         if (replan_tasks and new_plan_flag and finish_edge):
             finish_edge = False
             new_plan_flag = False
-            H = copy.deepcopy(H_new)
+            #H = copy.deepcopy(H_new)
+            H['e_v'] = copy.deepcopy(H_new['e_v'])
+            H['e_uv'] = copy.deepcopy(H_new['e_uv'])
+            H['e_g'] = copy.deepcopy(H_new['e_g'])
+            H['T_a'] = copy.deepcopy(H_new['T_a'])
+            #H['T_f'] = copy.deepcopy(H_new['T_f'])
+            #H['lastMeeting'] = copy.deepcopy(H_new['lastMeeting']) #!!!!!!!
             Hole_path = copy.deepcopy(Hole_path_new)
             replan_tasks = False
             new_task = 1
             abort_curr_edge = False
+            H['available'] = True
+
+            print '\n\nNEW PLAN UPDATED\n\n'
+
+
+
+        if H['T_f'] != T_f_last:
+            T_f_last = copy.deepcopy(H['T_f'])
+            T_f_msg.sender = id
+            T_f_msg.destinations = [-1]
+            T_f_msg.forbiden_Edges = H['T_f']
+
+            pub_forb.publish(T_f_msg)
+
 
         # Wait
         rate.sleep()
@@ -481,13 +638,12 @@ if __name__ == '__main__':
     print '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'
 
     #Define the characteristics of the robot given its ID
-    Vs = [pi / 2.0, pi / 2.0, pi / 3.0, pi / 2.0] #search speeds (rad/s) maximum is pi/2
+    Vs = [pi/2.0, pi/2.0, pi/3.0, pi/2.0] #search speeds (rad/s) maximum is pi/2
     Vd = [0.4, 0.55, 0.5, 0.4] #moving speeds (m/s)
     Vs = Vs[id]/1.1
     Vd = Vd[id]/1.1
 
     EXP_NAME = rospy.get_param('EXP_NAME')
-
 
     #Open txt files to write results of positions and velocities
     rp = rospkg.RosPack()
@@ -499,8 +655,6 @@ if __name__ == '__main__':
     file_vel = open(path, 'w')
 
     #Read the original graph
-    #original_graph = myLib.read_graph('Original_graph_35.mat')
-    #original_graph = myLib.read_graph('Original_graph_A1.mat')
     original_graph = myLib.read_graph("Original_graph_"+EXP_NAME+".mat")
     n = original_graph['n']
     nodes = original_graph['nodes']
@@ -524,15 +678,9 @@ if __name__ == '__main__':
 
     
     # Read the virtual graph
-    #virtual_graph = myLib.read_graph('Virtual_graph_35.mat')
-    #virtual_graph = myLib.read_graph('Virtual_graph_A1.mat')
     virtual_graph = myLib.read_graph("Virtual_graph_"+EXP_NAME+".mat")
 
     # Read search point sets
-    #SP = myLib.ReadSearchPoints("Map_35_SP.txt") # points will be removed from this list
-    #SP_fix = myLib.ReadSearchPoints("Map_35_SP.txt") # this list wont be changed
-    #SP = myLib.ReadSearchPoints("Map_A1_SP.txt")  # points will be removed from this list
-    #SP_fix = myLib.ReadSearchPoints("Map_A1_SP.txt")  # this list wont be changed
     SP = myLib.ReadSearchPoints("Map_"+EXP_NAME+"_SP.txt")  # points will be removed from this list
     SP_fix = myLib.ReadSearchPoints("Map_"+EXP_NAME+"_SP.txt")  # this list wont be changed
 

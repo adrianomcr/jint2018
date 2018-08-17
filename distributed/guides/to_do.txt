@@ -42,4 +42,47 @@ POP ALL EDGES ONLY IF NOT WAINTTING FOR A NEW PLAN BROADCAST
 MAYBE, AFERER POOPING ALL EGDGES THE ROBOT MAY PARTICIPATE IN A COMM GRAPH, WITHOUT INCLUDING ANY OF THE POPPED EDGES
 
 
-PROBLEM OF THE DEPOT POINTS !!!!!!!!!!!!!!!!!
+PROBLEM OF THE DEPOT POINTS !!!!!!!!!!!!!!!!! - Done
+
+
+
+
+STOP THE ROBOTS WHEN POPPING ALL EDGES - Done
+
+
+Modify the CPP algorithm in order to make it return different eulerian paths, at random.
+
+
+
+When a robot is passing through an edge and it checks if this edge is equal the last element in its e_v list. This may fail when the edge is the last element od e_v but because the robot has just received a new plan and the edge was visited by another robot and coincidently was placed in the last position of the e_v list
+
+
+The robot that is computting a replanning keeps countting it time while computing the replan, however, due the fact it is not moving
+
+
+
+
+!!!!!!!!!!! ----------  Policy for e_g definition   ---------- !!!!!!!!!!!
+When a robot makes a first replan it gets some edges in its e_g list. Currently,
+Example: (r0,r3) (r0,r2) (r0,r1,r2), Here, the edges assigned to r3 in the first meeting are not in e_g of r0 anymore, since r0 has only the edges assigned to r2. Thus, robots r0, r1, r2 will consider the edges assigned to r3 in their replanning.
+
+
+!!!!!!!!!!!! TO FRIDAY !!!!!!!!!!!!!!!
+Change the strategy that is now avoidding the robots to communicate after hey popped all edges. In the way that it is being done it also avoids the exchange of the t_f lists. Also, we need to incorporate the strategy to allow a robot to do replanning after all edges were popped, do not considering the popped edges from it, of course.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

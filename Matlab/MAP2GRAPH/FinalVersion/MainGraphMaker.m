@@ -57,7 +57,9 @@ clc;
 % ---------<input parameter>--------
 
 % InputFileImage='Map8_2.jpg'; % input image, .jpg or .png
-InputFileImage='MapA1.jpg'; % input image, .jpg or .png
+% InputFileImage='MapA1.jpg'; % input image, .jpg or .png
+InputFileImage='MapA2.jpg'; % input image, .jpg or .png
+InputFileImage='MapB1.jpg'; % input image, .jpg or .png
 ROBOTRADIUS=12; % Rotot Radius
 
 %Transform pixels to meters for the quadratic form
@@ -106,79 +108,173 @@ QUADGRAPH=QUADRATICFORM(GRAPH,INPUTIMAGE,VERTEXNUM,MeetPoints,resolution);
 save('saveAll.mat')
 %%
 
-if (strcmp(InputFileImage,'MapA1.jpg'))
-    Path_l = GRAPH;
-    save('GraphMapA1.mat', 'MeetPoints', 'Path_l')
-end
+% if (strcmp(InputFileImage,'MapA1.jpg'))
+%     Path_l = GRAPH;
+%     save('GraphMapA1.mat', 'MeetPoints', 'Path_l')
+% elseif (strcmp(InputFileImage,'MapA1.jpg'))
+%     Path_l = GRAPH;
+%     save('GraphMapA2.mat', 'MeetPoints', 'Path_l')
+% end
 
 %%
 
-MIGUE = 1;
+MIGUE = 0;
 if MIGUE
 
-    load('saveAll.mat')
+    if (strcmp(InputFileImage,'MapA1.jpg'))
+        load('saveAll.mat')
 
-    GRAPH(24);
-    GRAPH(49);
+        
+        % 24 - index of the edge that passed 'straigth'
+        % 81 - index of the edge that had a node (starting or ending) not connected
+        % 74 - index of the node to be connected
+        
+        GRAPH(24);
+        GRAPH(49);
 
-    node = GRAPH(81).path(end,:);
-    minDist = norm(GRAPH(24).path(1,:)-node);
-    id = 1;
-    for k = 2:1:length(GRAPH(24).path(:,1))
-        if norm(GRAPH(24).path(k,:)-node) < minDist
-            minDist = norm(GRAPH(24).path(k,:)-node);
-            id = k;
+        node = GRAPH(81).path(end,:);
+        minDist = norm(GRAPH(24).path(1,:)-node);
+        id = 1;
+        for k = 2:1:length(GRAPH(24).path(:,1))
+            if norm(GRAPH(24).path(k,:)-node) < minDist
+                minDist = norm(GRAPH(24).path(k,:)-node);
+                id = k;
+            end
         end
-    end
 
-    ggg = struct('path',[],'from',0,'To',0);
-    GRAPH(end+1) = ggg;
-    GRAPH(end).path = GRAPH(24).path(1:id,:);
-    GRAPH(end).from = GRAPH(24).from;
-    GRAPH(end).To = 74;
-    GRAPH(end+1) = ggg;
-    GRAPH(end).path = GRAPH(24).path((id+1):end,:);
-    GRAPH(end).from = 74;
-    GRAPH(end).To = GRAPH(24).To;
+        ggg = struct('path',[],'from',0,'To',0);
+        GRAPH(end+1) = ggg;
+        GRAPH(end).path = GRAPH(24).path(1:id,:);
+        GRAPH(end).from = GRAPH(24).from;
+        GRAPH(end).To = 74;
+        GRAPH(end+1) = ggg;
+        GRAPH(end).path = GRAPH(24).path((id+1):end,:);
+        GRAPH(end).from = 74;
+        GRAPH(end).To = GRAPH(24).To;
 
 
-    node = GRAPH(68).path(end,:);
-    minDist = norm(GRAPH(49).path(1,:)-node);
-    id = 1;
-    for k = 2:1:length(GRAPH(49).path(:,1))
-        if norm(GRAPH(49).path(k,:)-node) < minDist
-            minDist = norm(GRAPH(49).path(k,:)-node);
-            id = k;
+        node = GRAPH(68).path(end,:);
+        minDist = norm(GRAPH(49).path(1,:)-node);
+        id = 1;
+        for k = 2:1:length(GRAPH(49).path(:,1))
+            if norm(GRAPH(49).path(k,:)-node) < minDist
+                minDist = norm(GRAPH(49).path(k,:)-node);
+                id = k;
+            end
         end
-    end
 
-    ggg = struct('path',[],'from',0,'To',0);
-    GRAPH(end+1) = ggg;
-    GRAPH(end).path = GRAPH(49).path(1:id,:);
-    GRAPH(end).from = GRAPH(49).from;
-    GRAPH(end).To = 63;
-    GRAPH(end+1) = ggg;
-    GRAPH(end).path = GRAPH(49).path((id+1):end,:);
-    GRAPH(end).from = 63;
-    GRAPH(end).To = GRAPH(49).To;
+        ggg = struct('path',[],'from',0,'To',0);
+        GRAPH(end+1) = ggg;
+        GRAPH(end).path = GRAPH(49).path(1:id,:);
+        GRAPH(end).from = GRAPH(49).from;
+        GRAPH(end).To = 63;
+        GRAPH(end+1) = ggg;
+        GRAPH(end).path = GRAPH(49).path((id+1):end,:);
+        GRAPH(end).from = 63;
+        GRAPH(end).To = GRAPH(49).To;
 
 
-    GRAPH([24, 49]) = [];
+        GRAPH([24, 49]) = [];
 
-%     find_this_id = 74;
-%     for k = 1:1:length(GRAPH)
-%         if GRAPH(k).from == find_this_id || GRAPH(k).To == find_this_id
-%             k
+%         find_this_id = 74;
+%         for k = 1:1:length(GRAPH)
+%             if GRAPH(k).from == find_this_id || GRAPH(k).To == find_this_id
+%                 k
+%             end
 %         end
-%     end
 
 
 
-    Path_l = GRAPH;
-    save('GraphMapA1.mat', 'MeetPoints', 'Path_l')
+        Path_l = GRAPH;
+        save('GraphMapA1.mat', 'MeetPoints', 'Path_l')
+    
+    
+    elseif (strcmp(InputFileImage,'MapA2.jpg'))
+        
+        % 31 - index of the edge that passed 'straigth'
+        % 49 - index of the edge that had a node (starting or ending) not connected
+        % 43 - index of the node to be connected
+        
+        GRAPH(31);
+
+        node = GRAPH(49).path(end,:);
+        minDist = norm(GRAPH(31).path(1,:)-node);
+        id = 1;
+        for k = 2:1:length(GRAPH(31).path(:,1))
+            if norm(GRAPH(31).path(k,:)-node) < minDist
+                minDist = norm(GRAPH(31).path(k,:)-node);
+                id = k;
+            end
+        end
+
+        ggg = struct('path',[],'from',0,'To',0);
+        GRAPH(end+1) = ggg;
+        GRAPH(end).path = GRAPH(31).path(1:id,:);
+        GRAPH(end).from = GRAPH(31).from;
+        GRAPH(end).To = 43;
+        GRAPH(end+1) = ggg;
+        GRAPH(end).path = GRAPH(31).path((id+1):end,:);
+        GRAPH(end).from = 43;
+        GRAPH(end).To = GRAPH(31).To;
+
+        
+%         find_this_id = 43;
+%         for k = 1:1:length(GRAPH)
+%             if GRAPH(k).from == find_this_id || GRAPH(k).To == find_this_id
+%                 k
+%             end
+%         end
+
+        GRAPH([31]) = [];
+        Path_l = GRAPH;
+        save('GraphMapA2.mat', 'MeetPoints', 'Path_l')
+        
+    elseif (strcmp(InputFileImage,'MapA3.jpg'))
+        
+        % 24 - index of the edge that passed 'straigth'
+        % 81 - index of the edge that had a node (starting or ending) not connected
+        % 74 - index of the node to be connected
+        
+        GRAPH(24);
+
+        node = GRAPH(85).path(end,:);
+        minDist = norm(GRAPH(24).path(1,:)-node);
+        id = 1;
+        for k = 2:1:length(GRAPH(24).path(:,1))
+            if norm(GRAPH(24).path(k,:)-node) < minDist
+                minDist = norm(GRAPH(24).path(k,:)-node);
+                id = k;
+            end
+        end
+
+        ggg = struct('path',[],'from',0,'To',0);
+        GRAPH(end+1) = ggg;
+        GRAPH(end).path = GRAPH(24).path(1:id,:);
+        GRAPH(end).from = GRAPH(24).from;
+        GRAPH(end).To = 78;
+        GRAPH(end+1) = ggg;
+        GRAPH(end).path = GRAPH(24).path((id+1):end,:);
+        GRAPH(end).from = 78;
+        GRAPH(end).To = GRAPH(24).To;
+
+        
+%         find_this_id = 78;
+%         for k = 1:1:length(GRAPH)
+%             if GRAPH(k).from == find_this_id || GRAPH(k).To == find_this_id
+%                 k
+%             end
+%         end
+
+        GRAPH([24]) = [];
+        Path_l = GRAPH;
+        save('GraphMapA3.mat', 'MeetPoints', 'Path_l')
+        
+    end
+    
+    close all
+    QUADGRAPH=QUADRATICFORM(GRAPH,INPUTIMAGE,VERTEXNUM,MeetPoints,resolution);
+    SHOWGRAPH(QUADGRAPH,INPUTIMAGE,GRAPH,MeetPoints,resolution)
+    
 end %MIGUE
 
 
-% close all
-% QUADGRAPH=QUADRATICFORM(GRAPH,INPUTIMAGE,VERTEXNUM,MeetPoints,resolution);
-% SHOWGRAPH(QUADGRAPH,INPUTIMAGE,GRAPH,MeetPoints,resolution)

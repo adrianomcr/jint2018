@@ -16,7 +16,7 @@ H = pcolor(X,Y,image);
 H.LineStyle = 'none';
 colormap gray
 axis equal
-a*d
+% a*d
 for k = 1:1:length(GRAPH)
     tempcxcy=QUADGRAPH.Pol_coefs(k);
     cx=tempcxcy.coef_x;
@@ -36,6 +36,10 @@ for k = 1:1:length(GRAPH)
     hold on
     plot(xsim,ysim,'b','LineWidth',2);
 end
+
+% error('Stop here to capture the image, or comment it')
+warning('Stop here to capture the image, or comment it')
+
 
 nodes=QUADGRAPH.node_list;
 

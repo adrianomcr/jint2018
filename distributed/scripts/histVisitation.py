@@ -14,16 +14,17 @@ import tf
 import pylab
 import sys
 import rospkg
+import library2018 as myLib
 
 import matplotlib.pyplot as plt
-
+import copy
 
 
 
 def read_files():
     global R, E
 
-    global List, List_all
+    global List, List_all, flag
 
 
 
@@ -38,9 +39,14 @@ def read_files():
         line_list = [int(val) for val in line_list[0:]]
         List[r] = line_list
 
+
+    List_all_old = copy.deepcopy(List_all)
+
     List_all = []
     for r in range(R):
         List_all = List_all + List[r]
+
+
 
     #print 'Here is List_all:\n', List_all
 
@@ -51,7 +57,7 @@ def read_files():
             break
     #print 'flag = ', flag
     if flag:
-        print '\n----------  ----------  ----------\nAll edges seached\n----------  ----------  ----------\n'
+        print '----------  ----------  ----------\nAll edges seached\n----------  ----------  ----------'
 
 # ---------- !! ---------- !! ---------- !! ---------- !! ----------
 
@@ -64,7 +70,7 @@ def hist():
 
     global freq
     global R, E
-    global List, List_all
+    global List, List_all,List_all_old
 
 
     #pub_pose = rospy.Publisher("/marker_pose", Marker, queue_size=1)
@@ -74,6 +80,10 @@ def hist():
     #rospy.Subscriber("/robot_0/base_pose_ground_truth", Odometry, callback_pose)
     #rospy.Subscriber("/robot_0/base_scan", LaserScan, callback_laser)
 
+
+
+    List_all = []
+    List_all_old = []
 
     freq = 1.0  # Hz
     rate = rospy.Rate(freq)
@@ -98,7 +108,13 @@ def hist():
     pylab.ion()
     pylab.show()
 
-    sleep(38)
+    #sleep(1)
+
+    read_files()
+
+    while not List_all and not rospy.is_shutdown():
+        read_files()
+        rate.sleep()
 
     while not rospy.is_shutdown():
 
@@ -107,22 +123,27 @@ def hist():
         #x.append(E * randrange(0, 1000, 1) / 1000)
         #print 'Here\n',x
 
-        pylab.clf()
-        pylab.figure(50)
-        pylab.xlim(0, E)
-        pylab.ylim(0, 4)
-        pylab.xlabel('Edges')
-        pylab.ylabel('Visitations')
-        pylab.title('Histogram of visitations')
 
-        read_files()
-        pylab.hist(List_all, E, color='b')
+        if List_all != List_all_old:
+            pylab.clf()
+            pylab.figure(50)
+            pylab.xlim(0, E)
+            pylab.ylim(0, 4)
+            pylab.xlabel('Edges')
+            pylab.ylabel('Visitations')
+            pylab.title('Histogram of visitations')
 
-        #pylab.ion()
-        #pylab.show()
-        pylab.draw()
+            read_files()
+            #if List_all: #if List_all is not empty
+            pylab.hist(List_all, E, color='b')
+
+            #pylab.ion()
+            #pylab.show()
+            pylab.draw()
 
         rate.sleep()
+
+
 
 
 # ---------- !! ---------- !! ---------- !! ---------- !! ----------
@@ -137,6 +158,7 @@ if __name__ == '__main__':
 
     global R, E
 
+    """
     #Read the target index
     if len(sys.argv) < 3:
         #print 'ERROR!!!\nThe number of robots was not informed'
@@ -145,7 +167,13 @@ if __name__ == '__main__':
         R = int(sys.argv[1])
         E = int(sys.argv[2])
         #E = int(sys.argv[1])
+    """
 
+    R = rospy.get_param('NUM_OF_ROBOTS')
+    EXP_NAME = rospy.get_param('EXP_NAME')
+    E = myLib.read_graph("Virtual_graph_"+EXP_NAME+".mat")
+    E = E['n']
+    print 'Here is E: ', E
 
     try:
         hist()
