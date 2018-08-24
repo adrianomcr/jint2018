@@ -99,82 +99,6 @@ def callback_laser(data):
 
 
 
-# Callback routine to obtain data from the sensor simulator
-# Here is were the robot wth minimum id calls the replanning function
-def callback_comm_graph_BAK(data):
-    # This function recieves messages from the centralized sensor simulator
-
-    global list_of_H, list_of_robs, list_of_vels, H
-    global replan_tasks, finish_edge, id
-    global vel, pub_stage, pub_broadcast, change_plan, Hole_path_list, new_Hists, original_graph, virtual_graph, list_of_H, list_of_robs
-    global count
-    global stop_the_robot
-    global waitting_new_plan
-    global new_plan_flag
-
-    R = len(data.listOfH)
-    ids = []
-    for r in range(R):
-        ids.append(data.listOfH[r].id)
-
-    #If this robot is involved in the communication graph
-    if id in ids:
-        # If some positive change (which adds information) happend in the communication graph
-        if data.comGraphEvent == True:
-            replan_tasks = True
-            finish_edge = False
-            list_of_H = data.listOfH
-            list_of_robs = data.robList
-
-            print '\n          ---------- Communication graph event received ----------\n'
-            print 'Finishing Edge ...'
-
-            #Uptate lastMeeting from now
-            H['lastMeeting'] = list(list_of_robs)
-
-        stop_the_robot = False
-
-
-        # Compute the new routes if the current robot has munimum index
-        if (id == min(list_of_robs)):
-            # Stop the robot
-            VX, WZ = 0, 0
-            vel.linear.x, vel.angular.z = VX, WZ
-            pub_stage.publish(vel)
-
-            #Flag to stop the robot while it is computting a replan
-            stop_the_robot = True
-
-            # Call the replanning function (Algorithm 2) ----------  ----------  ----------
-            #Old replanning method
-            #change_plan, Hole_path_list, new_Hists = Alg2.replanning(original_graph, virtual_graph, list_of_H)
-
-            # New (better) replanning method
-            change_plan, Hole_path_list, new_Hists = Alg2.replanning_heuristics(original_graph, virtual_graph, list_of_H)
-            # ----------  ----------  ----------  ----------  ----------  ----------  ----------
-            stop_the_robot = False
-
-            #Broadcast new plan to other robots
-            print '\nCreating Broadcast message ...\n'
-            B = Broadcast()
-            B.sender = id
-            R = len(new_Hists)
-            B.destinations = []
-            for r in range(R):
-                B.destinations.append(new_Hists[r].id)
-            for r in range(R):
-                IL = Intlist()
-                IL.data = list(Hole_path_list[r])
-                B.new_Hole_paths.append(IL)
-            B.listOfH = new_Hists
-
-            pub_broadcast.publish(B)
-            print 'New plan broadcasted'
-
-            # -----------------------------------------------
-
-    return
-# ----------  ----------  ----------  ----------  ----------
 
 
 
@@ -212,6 +136,7 @@ def callback_comm_graph(data):
         Hmsg.Whole_path = Hole_path
         H['available'] = False
         Hmsg.available = H['available']
+        Hmsg.popped_edges  = H['popped_edges']
         pub_hist.publish(Hmsg)
 
 
@@ -311,6 +236,10 @@ def callback_new_plan(data):
         H_new['T_a'] = list(Hmsg.T_a)
         #H_new['T_f'] = list(Hmsg.T_f)
         H_new['lastMeeting'] = list(Hmsg.lastMeeting)
+
+        if Hole_path_new:
+            H['popped_edges'] = False
+
 
         global abort_curr_edge
         abort_curr_edge = Hmsg.abort_curr_edge
@@ -476,7 +405,7 @@ def Algorithm_1():
 
     # Publish the History to the centralized communication simulator in order to keep it actualized
     Hmsg = History()
-    Hmsg.id, Hmsg.specs, Hmsg.e_v, Hmsg.e_uv, Hmsg.e_g, Hmsg.T_a, Hmsg.T_f, Hmsg.currEdge, Hmsg.nextNode, Hmsg.pose, Hmsg.lastMeeting, Hmsg.abort_curr_edge, Hmsg.available = id, [Vd, Vs], H['e_v'], H['e_uv'], H['e_g'], H['T_a'], H['T_f'], EdgeMap[Hole_path[0]-1][Hole_path[1]-1], Hole_path[0], pose, [], False, True
+    Hmsg.id, Hmsg.specs, Hmsg.e_v, Hmsg.e_uv, Hmsg.e_g, Hmsg.T_a, Hmsg.T_f, Hmsg.currEdge, Hmsg.nextNode, Hmsg.pose, Hmsg.lastMeeting, Hmsg.abort_curr_edge, Hmsg.available, Hmsg.popped_edges = id, [Vd, Vs], H['e_v'], H['e_uv'], H['e_g'], H['T_a'], H['T_f'], EdgeMap[Hole_path[0]-1][Hole_path[1]-1], Hole_path[0], pose, [], False, True, False
     Hmsg.Whole_path = Hole_path
     pub_hist.publish(Hmsg)
 
@@ -489,7 +418,8 @@ def Algorithm_1():
     #waitting_new_plan = False
     finish_edge = False
 
-    pop_all_edges_flag = False
+    #pop_all_edges_flag = False
+    #H['popped_edges'] = False
 
     global stop_the_robot
     stop_the_robot = False
@@ -506,12 +436,14 @@ def Algorithm_1():
 
         # If there is no need to do replanning, just keep moving through the current edge
         if not replan_tasks:
-            [H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag] = myLib.keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pop_all_edges_flag, pub_stage)
+            #[H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag] = myLib.keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pop_all_edges_flag, pub_stage)
+            [H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge] = myLib.keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pub_stage)
         # If it is necessary to do replanning ...
         else:
             # First, just keep moving through the current edge only to finish it
             if(not finish_edge):
-                [H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag] = myLib.keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pop_all_edges_flag, pub_stage)
+                #[H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag] = myLib.keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pop_all_edges_flag, pub_stage)
+                [H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge] = myLib.keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pub_stage)
                 if change_edge:
                     finish_edge = True
                     print '\nEdge finished\n\nWaitting new plan broadcast\n'
@@ -571,6 +503,7 @@ def Algorithm_1():
         Hmsg.id, Hmsg.specs, Hmsg.e_v, Hmsg.e_uv, Hmsg.e_g, Hmsg.T_a, Hmsg.T_f, Hmsg.currEdge, Hmsg.nextNode, Hmsg.pose, Hmsg.lastMeeting, Hmsg.abort_curr_edge = id, [Vd, Vs], H['e_v'], H['e_uv'], H['e_g'], H['T_a'], H['T_f'], edge, pathNode[0], pose, H['lastMeeting'], False
         Hmsg.Whole_path = Hole_path
         Hmsg.available = H['available']
+        Hmsg.popped_edges = H['popped_edges']
         pub_hist.publish(Hmsg)
 
 
@@ -638,10 +571,15 @@ if __name__ == '__main__':
     print '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'
 
     #Define the characteristics of the robot given its ID
-    Vs = [pi/2.0, pi/2.0, pi/3.0, pi/2.0] #search speeds (rad/s) maximum is pi/2
-    Vd = [0.4, 0.55, 0.5, 0.4] #moving speeds (m/s)
-    Vs = Vs[id]/1.1
-    Vd = Vd[id]/1.1
+    #Vs = [pi / 2.0, pi / 2.0, pi / 3.0, pi / 2.0]  # search speeds (rad/s) maximum is pi/2
+    #Vd = [0.4, 0.55, 0.5, 0.4]  # moving speeds (m/s)
+    #Vs = Vs[id]/1.1
+    #Vd = Vd[id]/1.1
+
+    Vs = [1.5, 1.5, 1.0, 1.5]  # search speeds (rad/s) maximum is pi/2
+    Vd = [0.4, 0.55, 0.5, 0.4]  # moving speeds (m/s)
+    Vs = Vs[id] / 1.0
+    Vd = Vd[id] / 1.0
 
     EXP_NAME = rospy.get_param('EXP_NAME')
 
@@ -672,8 +610,8 @@ if __name__ == '__main__':
     T_a = [IL for i in range(len(PolC[0]))] # list of list of robots assigned to an edge
     T_f = []  # list of list of robots forbidden to visit an edge
     lastMeeting = [] #list of who was in the communicatio graph in the last meeting
-    H = {'id': id, 'specs': [Vd, Vs], 'e_v': e_v, 'e_uv': e_uv, 'e_g': e_g, 'T_a': T_a, 'T_f': T_f, 'lastMeeting': lastMeeting, 'Whole_path': [], 'available': True}
-    H_new = {'id': id, 'specs': [Vd, Vs], 'e_v': e_v, 'e_uv': e_uv, 'e_g': e_g, 'T_a': T_a, 'T_f': T_f, 'lastMeeting': lastMeeting, 'Whole_path': [], 'available': True}
+    H = {'id': id, 'specs': [Vd, Vs], 'e_v': e_v, 'e_uv': e_uv, 'e_g': e_g, 'T_a': T_a, 'T_f': T_f, 'lastMeeting': lastMeeting, 'Whole_path': [], 'available': True, 'popped_edges': False}
+    H_new = {'id': id, 'specs': [Vd, Vs], 'e_v': e_v, 'e_uv': e_uv, 'e_g': e_g, 'T_a': T_a, 'T_f': T_f, 'lastMeeting': lastMeeting, 'Whole_path': [], 'available': True, 'popped_edges': False}
 
 
     

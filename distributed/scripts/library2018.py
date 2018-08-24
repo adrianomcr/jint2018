@@ -308,7 +308,8 @@ def pop_all_edges(H):
 
 
 
-def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge,pop_all_edges_flag, pub_stage):
+#def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge,pop_all_edges_flag, pub_stage):
+def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, original_graph, freq, pose, laserVec, d, Vd, Kp, id, edge, pub_stage):
 
     C = original_graph['C']
     PathM = original_graph['PathM']
@@ -344,11 +345,14 @@ def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, 
 
 
     if new_path == 1:
-        if ((len(H['e_uv']) == 0 and not pop_all_edges_flag)):
-            pop_all_edges_flag = True
+        #if ((len(H['e_uv']) == 0 and not pop_all_edges_flag)):
+        if ((len(H['e_uv']) == 0 and not H['popped_edges'])):
+            #pop_all_edges_flag = True
+            H['popped_edges'] = True
+            #H['available'] = False
+            # H['popped_edges'] = True
 
             print '\n\n----------  ----------  ----------\nPOPPING ALL EDGES\n----------  ----------  ----------\n'
-            H['available'] = False
             for kk in range(len(PolC[0])):
                 print kk+1,'/',len(PolC[0])
                 if not (kk + 1 in H['e_v']) and not (kk + 1 in H['T_f']):
@@ -360,7 +364,8 @@ def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, 
                 print'\n----------  All the edges were already visited  ----------\n'
                 end_flag = True
                 VX, WZ = 0, 0
-                return H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag
+                #return H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag
+                return H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge
             H['e_g'] = []
             print "Here is H['e_uv']"
             print H['e_uv']
@@ -381,10 +386,13 @@ def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, 
             pathNode = getNodePath(i - 1, j - 1, PathM)
             new_task = 0
             new_path = 1
-        elif (len(H['e_uv']) == 0 and pop_all_edges_flag):
+        #elif (len(H['e_uv']) == 0 and pop_all_edges_flag):
+        #elif (len(H['e_uv']) == 0 and H['popped_edges']):
+        elif (len(H['T_f']) == len(PolC[0])):
             print'\n----------  All popped edges were visited  ----------\n'
             end_flag = True
-            return H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag
+            #return H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag
+            return H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge
 
         i = pathNode.pop(0)
         j = pathNode[0]
@@ -436,7 +444,8 @@ def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, 
         [VX, WZ] = feedback_linearization(ux, uy, pose, d)
 
 
-    return H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag
+    #return H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge, pop_all_edges_flag
+    return H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, new_task, new_path, VX, WZ, end_flag, edge, change_edge
 # ----------  ----------  ----------  ----------  ----------
 
 

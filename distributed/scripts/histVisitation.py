@@ -12,7 +12,7 @@ from random import randrange
 from time import sleep
 import tf
 import pylab
-import sys
+import sys, os
 import rospkg
 import library2018 as myLib
 
@@ -25,6 +25,7 @@ def read_files():
     global R, E
 
     global List, List_all, flag
+    global count_flag
 
 
 
@@ -58,6 +59,11 @@ def read_files():
     #print 'flag = ', flag
     if flag:
         print '----------  ----------  ----------\nAll edges seached\n----------  ----------  ----------'
+        #count_flag = count_flag + 1
+        if count_flag % 15 == 0:
+            print 'count_flag = ', count_flag
+            os.system('spd-say "All edges seached"')
+        count_flag = count_flag + 1
 
 # ---------- !! ---------- !! ---------- !! ---------- !! ----------
 
@@ -71,6 +77,9 @@ def hist():
     global freq
     global R, E
     global List, List_all,List_all_old
+    global count_flag
+
+    count_flag = 0
 
 
     #pub_pose = rospy.Publisher("/marker_pose", Marker, queue_size=1)

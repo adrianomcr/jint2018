@@ -162,6 +162,7 @@ def callback_hist_0(data):
     H_all[0]['Whole_path'] = list(data.Whole_path)
 
     H_all[0]['available'] = data.available
+    H_all[0]['popped_edges'] = data.popped_edges
 
     flag_h[0] = 1
 
@@ -188,6 +189,7 @@ def callback_hist_1(data):
     H_all[1]['Whole_path'] = list(data.Whole_path)
 
     H_all[1]['available'] = data.available
+    H_all[1]['popped_edges'] = data.popped_edges
 
     flag_h[1] = 1
 
@@ -214,6 +216,7 @@ def callback_hist_2(data):
     H_all[2]['Whole_path'] = list(data.Whole_path)
 
     H_all[2]['available'] = data.available
+    H_all[2]['popped_edges'] = data.popped_edges
 
 
     flag_h[2] = 1
@@ -241,6 +244,7 @@ def callback_hist_3(data):
     H_all[3]['Whole_path'] = list(data.Whole_path)
 
     H_all[3]['available'] = data.available
+    H_all[3]['popped_edges'] = data.popped_edges
 
     flag_h[3] = 1
 
@@ -278,6 +282,8 @@ def send_message_recompute_close(pub_comm_graph, ids):
         H.pose = H_all[ids[r]]['pose']
         H.lastMeeting = copy.deepcopy(ids)
         H.Whole_path = H_all[ids[r]]['Whole_path']
+        H.available = H_all[ids[r]]['available']
+        H.popped_edges = H_all[ids[r]]['popped_edges']
         HL.robList.append(H_all[ids[r]]['id'])
         HL.listOfH.append(H)
 
@@ -285,10 +291,6 @@ def send_message_recompute_close(pub_comm_graph, ids):
 
     return
 # ----------  ----------  ----------  ----------  ----------
-
-
-
-
 
 
 """
@@ -309,12 +311,12 @@ def update_forbidden_edges(CG):
 # ----------  ----------  ----------  ----------  ----------
 """
 
+
 # Callback function to keep changing
 def callback_ForbEdges(data):
 
     global list_T_f, list_T_f_last
 
-    #print 'data:\n', data
 
     if (list(data.destinations) == [-1]):
         id = data.sender
@@ -346,9 +348,6 @@ def update_forbidden_edges(pub_forb,CG):
             forb_edges_msg.forbiden_Edges = updated_list
             pub_forb.publish(forb_edges_msg)
 
-
-
-
     return
 # ----------  ----------  ----------  ----------  ----------
 
@@ -374,6 +373,7 @@ def sensor_simulator():
          'lastMeeting': [],
          'Whole_path': [],
          'available': True,
+         'popped_edges': True
     })
 
 
@@ -436,10 +436,15 @@ def sensor_simulator():
                 if (i<j):
                     M[i][j] = ((poses[i][0]-poses[j][0])**2+(poses[i][1]-poses[j][1])**2)**0.5
 
-                    #Strategy to disconsider those robots who popped all edges
-                    if((not H_all[i]['available']) or (not H_all[j]['available'])):
-                        M[i][j] = M[i][j] + 10*DIST_LEAVE
+                    # Strategy to disconsider those robots who are waitting for a new replan
+                    if ((not H_all[i]['available']) or (not H_all[j]['available'])):
+                        M[i][j] = M[i][j] + 10 * DIST_LEAVE
 
+                    """
+                    # Strategy to disconsider those robots who popped all edges
+                    if ((not H_all[i]['popped_edges']) or (not H_all[j]['popped_edges'])):
+                        M[i][j] = M[i][j] + 10 * DIST_LEAVE
+                    """
 
                     if M[i][j] < DIST_INTO:
                         BM[i][j] = 1.0
@@ -471,7 +476,8 @@ def sensor_simulator():
         # ----------  ----------  ----------  ----------  ----------
         #If the communication graph has changed
         if (not CG==previous_CG):
-            previous_CG = CG # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            previous_CG = CG
+
             #Loop for all connected coponnents in CG
             for c in range(len(CG)):
                 ids = CG[c]

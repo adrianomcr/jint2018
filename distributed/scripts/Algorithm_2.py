@@ -47,13 +47,13 @@ def define_subsets_new(list_of_H,virtual_graph):
     set_g = []
     pts = []
 
-    currEdge_all = []
+    #currEdge_all = []
     e_vT_f_all = []
     e_g_all = []
     for r in range(R):
-        exec ('currEdge_all = currEdge_all +  [H%d.currEdge]' % (r))
-        exec ('e_vT_f_all = e_vT_f_all +  list(H%d.e_v) + list(H%d.T_f)' % (r,r))
-        exec ('e_g_all = e_g_all +  list(H%d.e_g)' % (r))
+        #currEdge_all = currEdge_all +  [list_of_H[r].currEdge]
+        e_vT_f_all = e_vT_f_all +  list(list_of_H[r].e_v) + list(list_of_H[r].T_f)
+        e_g_all = e_g_all +  list(list_of_H[r].e_g)
     T_a_all = []
     for e in range(len(list_of_H[0].T_a)):
         T_a_all.append([])
@@ -108,12 +108,19 @@ def replanning_heuristics(original_graph, virtual_graph, list_of_H):
 
     #print 'Here is the beguinning of my function'
 
+
     PolC = original_graph['PolC']
 
     colors_0 = ['b', 'r', 'g', 'y']
 
     R = len(list_of_H)
 
+
+    print '\n'
+    for r in range(R):
+        print 'popped_edges of robot ', list_of_H[r].id, ': ', list_of_H[r].popped_edges
+
+    print '\n'
     for r in range(R):
         print 'LastMeeting robot ', list_of_H[r].id, ': ', list_of_H[r].lastMeeting
 
@@ -166,8 +173,27 @@ def replanning_heuristics(original_graph, virtual_graph, list_of_H):
         cost = cost[0]
         C_edge.append(cost)
 
+    # --------------------------------------------------------------
+    # Define the depot virtual nodes for the task assignment
+    depots = []
+    for r in range(R):
+        #exec ('depots.append(set_uv.index(H%d.currEdge))' % r)
+        depots.append(set_uv.index(list_of_H[r].currEdge))
+    THE DEPOT POINT MAY NOT BE IN e_uv
+
+    #print '\nHere is depot virtual nodes (new indexes):'
+    #print depots
+    #print 'Here is depot virtual nodes (original indexes):'
+    depots_ori = [] #original depot points??
+    for r in range(R):
+        depots_ori.append(set_uv[depots[r]])
+    #print depots_ori, '\n'
+    #--------------------------------------------------------------
+
+
     print '\n ----- Task assignment function called -----'
-    sol, division = TAHEU.heuristic_loop(original_graph,speeds, search_speeds, Cuv, Cuv_sp, pts, pts_id)
+    sol, division = TAHEU.heuristic_loop(original_graph,speeds, search_speeds, Cuv, Cuv_sp, pts, pts_id,depots)
+    #PASS THE DEPOT POINTS
     # ----------  ----------  ----------  ----------  ----------  ----------  ----------
 
     # Sort the lists

@@ -148,7 +148,7 @@ def Time_counter():
             else:
                 myStr = myStr + ":" + str(ss)
 
-            print 'time (mm:ss): ', myStr
+            print 'time (mm:ss): ', myStr, '\t\t\ttime (ss): ', tempo
 
         #Wait
         rate.sleep()
