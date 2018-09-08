@@ -1,12 +1,18 @@
 
+
+
+
 close all;
 clear all; clc;
 
 % Choose which graph to use
-% NAME = '35';
+NAME = '35';
 % NAME = 'A1';
 NAME = 'A2';
 % NAME = 'B1';
+% NAME = 'B4';
+% NAME = 'B5';
+% NAME = 'B6';
 
 
 fig = imread(sprintf('./pixel_files/Map%s.jpg',NAME));
@@ -30,7 +36,7 @@ if 1
 
         %Loop to detect a short edge
         for e = 1:1:length(Path_l)
-            if length(Path_l(e).path(:,1)) < 5
+            if length(Path_l(e).path(:,1)) < 25
                 flag = 1;
                 break
             end
@@ -44,14 +50,17 @@ if 1
             delid = max([id1,id2]); % id to be removed
             Path_l(e) = [];
             %Replace the ids of the other edges
+%             count = 0;
             for e = 1:1:length(Path_l)
                 if Path_l(e).from == delid
                     Path_l(e).from = newid;
+%                     count = count+1;
                 end
                 if Path_l(e).To == delid
                     Path_l(e).To = newid;
+%                     count = count+1;
                 end
-            end
+            end 
             %Shift the ids bigger than newid
             for e = 1:1:length(Path_l)
                 if Path_l(e).from > delid
@@ -330,5 +339,5 @@ set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.4, 0.4, 0.5, 0.5]);
 % % imwrite(Mnew,'./MAP2GRAPH/FinalVersion/MapA2_new.png','PNG');
 % imwrite(Mnew,'./MAP2GRAPH/FinalVersion/MapA2_new.jpg','JPG','Quality',100);
 
-        
+ 
         

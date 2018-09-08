@@ -64,7 +64,7 @@ def compute_cluster_costs(graph,pts_id):
 
 
 
-def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id):
+def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id,depots):
 
 
 
@@ -81,10 +81,11 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id):
 
     example_colors = ['r','g','b','y','m','c','k','w']
 
-
     MAX_NUM_CLUSTERS = 2 * R + 5
+    MAX_NUM_CLUSTERS = 2 * R + 3 + 1
     #MAX_NUM_CLUSTERS = 6
 
+    #PLOT = True
     PLOT = False
 
 
@@ -240,16 +241,37 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id):
     Power_robot_sp = search_speeds
 
 
-    Cost_cluster_len = [0 for k in range(n_clusters)]
-    Cost_cluster_sp = [0 for k in range(n_clusters)]
+    Cost_cluster_len = [0 for k in range(n_clusters)] # cost of the length of the cluster
+    Cost_cluster_sp = [0 for k in range(n_clusters)] # cost of the search points of the cluster
     for k in range(len(final_cluster)):
         Cost_cluster_len[final_cluster[k][1]] = Cost_cluster_len[final_cluster[k][1]] + C_edge_len[k]
         Cost_cluster_sp[final_cluster[k][1]] = Cost_cluster_sp[final_cluster[k][1]] + C_edge_sp[k]
 
+    R = len(speeds)
+    T = len(Cost_cluster_len)
+
+    #depots = [1,46,1,1]#AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    Cost_cluster_to_go = [] # cost of the length for robot r go to cluster t
+    for r in range(R):
+        Cost_cluster_to_go.append([])
+        for t in range(T):
+            Cost_cluster_to_go[r].append(100000)
+            for k in range(len(final_cluster)):
+                if (final_cluster[k][1] == t):
+                    dist = C[k][depots[r]]
+                    #dist = (()**2+()**2)**0.5
+                    if (dist < Cost_cluster_to_go[r][t]):
+                        Cost_cluster_to_go[r][t] = dist
+
+    print 'Cost_cluster_to_go:\n', Cost_cluster_to_go
+
+
+
     print '\nCalling MILP to assign the clusters ...'
 
     #sol = LP.atribute_clusters(Power_robot, Cost_cluster)
-    sol = LP.atribute_clusters(Power_robot_len,Power_robot_sp, Cost_cluster_len, Cost_cluster_sp)
+    #sol = LP.atribute_clusters(Power_robot_len,Power_robot_sp, Cost_cluster_len, Cost_cluster_sp)
+    sol = LP.atribute_clusters(Power_robot_len,Power_robot_sp, Cost_cluster_len, Cost_cluster_sp, Cost_cluster_to_go)
     # ---------- ---------- ----------
 
 
@@ -268,9 +290,6 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id):
 
     print 'Elapsed time: ', count_time, '\n'
 
-
-    R = len(speeds)
-    T = len(Cost_cluster_len)
 
 
     division = []

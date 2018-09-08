@@ -47,13 +47,14 @@ def define_subsets_new(list_of_H,virtual_graph):
     set_g = []
     pts = []
 
-    #currEdge_all = []
+    currEdge_all = []
     e_vT_f_all = []
     e_g_all = []
     for r in range(R):
         #currEdge_all = currEdge_all +  [list_of_H[r].currEdge]
         e_vT_f_all = e_vT_f_all +  list(list_of_H[r].e_v) + list(list_of_H[r].T_f)
         e_g_all = e_g_all +  list(list_of_H[r].e_g)
+        currEdge_all = currEdge_all + [list_of_H[r].currEdge]
     T_a_all = []
     for e in range(len(list_of_H[0].T_a)):
         T_a_all.append([])
@@ -69,7 +70,11 @@ def define_subsets_new(list_of_H,virtual_graph):
     #print '\n----------  ----------  ----------\ne_g_all = \n', e_g_all, '\n----------  ----------  ----------\n'
 
     for k in range(len(pts_0)):  # loop over all of the orignal edges
-        if((k + 1) in e_vT_f_all):  # Forgot about the visited edges (we are done with them)
+        if ((k + 1) in currEdge_all):  # Add the current edges in the unvisited set (THEY SHOULD BE REMOVED NEXT)
+            set_uv.append(k + 1)
+            pts.append(pts_0[k])
+            pts_id.append(k)
+        elif((k + 1) in e_vT_f_all):  # Forgot about the visited edges (we are done with them)
             set_v.append(k + 1)
         elif ((k + 1) in e_g_all):  # If the edge is assigned to other robot -> analyze if ths other robot is in the network
             flag = False
@@ -88,7 +93,7 @@ def define_subsets_new(list_of_H,virtual_graph):
             pts_id.append(k)
 
 
-    return set_uv, set_v, set_g, pts, pts_id
+    return set_uv, set_v, set_g, pts, pts_id, e_vT_f_all
 # ----------  ----------  ----------  ----------  ----------  ----------  ----------
 
 
@@ -142,8 +147,10 @@ def replanning_heuristics(original_graph, virtual_graph, list_of_H):
 
 
     # Call function to define the sests E_v, E_uv and E_g
-    set_uv, set_v, set_g, pts, pts_id = define_subsets_new(list_of_H, virtual_graph)
+    set_uv, set_v, set_g, pts, pts_id, e_vT_f_all = define_subsets_new(list_of_H, virtual_graph)
     # ----------  ----------  ----------  ----------  ----------
+
+
 
     print '\nHere is set_v (visited edges) in original inedexes:'
     print set_v
@@ -179,7 +186,7 @@ def replanning_heuristics(original_graph, virtual_graph, list_of_H):
     for r in range(R):
         #exec ('depots.append(set_uv.index(H%d.currEdge))' % r)
         depots.append(set_uv.index(list_of_H[r].currEdge))
-    THE DEPOT POINT MAY NOT BE IN e_uv
+    #THE DEPOT POINT MAY NOT BE IN e_uv
 
     #print '\nHere is depot virtual nodes (new indexes):'
     #print depots
@@ -206,6 +213,28 @@ def replanning_heuristics(original_graph, virtual_graph, list_of_H):
             division[r][k] = set_uv[division[r][k]]
 
 
+    #"""
+    # Exclude/Remove the used depot virtual nodes (they are edges that were already visited)
+    for r1 in range(R):
+        for r2 in range(R):
+            if list_of_H[r1].currEdge in division[r2]:
+                # Remove currEdge only if it is not on e_v, because the robot may only be passing through the edge without searching on it
+                print 'AAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAA\n'
+                if list_of_H[r1].currEdge in e_vT_f_all:
+                #if list_of_H[r1].currEdge in list_of_H[r2].T_f:
+                    division[r2].pop(division[r2].index(list_of_H[r1].currEdge))
+                    print 'BBBBBBBBBBBBBBBBBB\nBBBBBBBBBBBBBBBBBB\n'
+                    #print 'division[r2]:\n', division[r2]
+                    set_v.append(list_of_H[r1].currEdge)
+                    print 'Edge appended: ', list_of_H[r1].currEdge
+
+
+    # Include the used depot virtual nodes in the visited set
+    #for r in range(R):
+    #    set_v.append(list_of_H[r].currEdge)
+    #"""
+
+
     print '\nAssigned edges for the robots:'
     for r in range(R):
         print 'Subset for robot ' + str(list_of_H[r].id) + ': ', division[r]
@@ -224,7 +253,7 @@ def replanning_heuristics(original_graph, virtual_graph, list_of_H):
         pylab.subplot(2, R, R + (r + 1))
         subgraphs[r] = MST.MSTconnect(original_graph,division[r], (list_of_H[r]).nextNode, colors[r], True)
     for r in range(R):
-        print 'Subset of edges for robot ' + str(r) + ': (original indexes)\n', subgraphs[r]
+        print 'Subset of edges for robot ' + str(list_of_H[r].id) + ': (original indexes)\n', subgraphs[r]
         print 'Start node for robot ' + str(list_of_H[r].id) + ':', (list_of_H[r]).nextNode, '\n'
     # ----------  ----------  ----------  ----------  ----------
 
@@ -242,7 +271,7 @@ def replanning_heuristics(original_graph, virtual_graph, list_of_H):
             Hole_path_list[r] = CPPlib.main_CPP(sorted(edges_listOfTuples), current_node)
         else:
             Hole_path_list[r] = []
-        print 'Route for robot ' + str(r), ': ', Hole_path_list[r], '\n'
+        print 'Route for robot ' + str(list_of_H[r].id), ': ', Hole_path_list[r], '\n'
     print '\n'
     # ----------  ----------  ----------  ----------  ----------
 
@@ -450,6 +479,7 @@ def replanning_heuristics(original_graph, virtual_graph, list_of_H):
     # ----------  ----------  ----------  ----------  ----------
 
     # Choose if the result of the planning will be platted or not
+    #SHOW_NEW_PLAN = True
     SHOW_NEW_PLAN = False
     if SHOW_NEW_PLAN:
         pylab.show()
@@ -789,6 +819,8 @@ def replanning(original_graph, virtual_graph, list_of_H):
 
     # Exclude/Remove the used depot virtual nodes (they are edges that were already visited)
     for r in range(R):
+        print 'division[r]', division[r]
+        print 'division[r].index(list_of_H[r].currEdge)', division[r].index(list_of_H[r].currEdge)
         division[r].pop(division[r].index(list_of_H[r].currEdge))
 
     # Include the used depot virtual nodes in the visited set
@@ -836,7 +868,7 @@ def replanning(original_graph, virtual_graph, list_of_H):
         #Hole_path_list[r] = cppsolver.CPP(sorted(edges_listOfTuples), current_node)
         Hole_path_list[r] = CPPlib.main_CPP(sorted(edges_listOfTuples), current_node)
     #for k in range(R):
-        print 'Route for robot ' + str(k), ': ', Hole_path_list[k]
+        print 'Route for robot ' + str(r), ': ', Hole_path_list[r]
     print '\n'
     # ----------  ----------  ----------  ----------  ----------
 
@@ -1109,8 +1141,8 @@ def replanning(original_graph, virtual_graph, list_of_H):
     # ----------  ----------  ----------  ----------  ----------
 
     # Choose if the result of the planning will be platted or not
-    #SHOW_NEW_PLAN = True
-    SHOW_NEW_PLAN = False
+    SHOW_NEW_PLAN = True
+    #SHOW_NEW_PLAN = False
     if SHOW_NEW_PLAN:
         pylab.show()
     pylab.close()

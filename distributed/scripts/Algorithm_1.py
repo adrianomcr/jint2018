@@ -165,6 +165,8 @@ def callback_comm_graph(data):
             #Flag to stop the robot while it is computting a replan
             stop_the_robot = True
 
+            total_time = tm.time()
+
             # Call the replanning function (Algorithm 2) ----------  ----------  ----------
             #Old replanning method
             #change_plan, Hole_path_list, new_Hists = Alg2.replanning(original_graph, virtual_graph, list_of_H)
@@ -172,6 +174,8 @@ def callback_comm_graph(data):
             # New (better) replanning method
             change_plan, Hole_path_list, new_Hists = Alg2.replanning_heuristics(original_graph, virtual_graph, list_of_H)
             # ----------  ----------  ----------  ----------  ----------  ----------  ----------
+
+            print 'Tital time of replanning: ', tm.time()-total_time
 
 
             #Broadcast new plan to other robots
@@ -468,7 +472,9 @@ def Algorithm_1():
 
 
         if(len(H['e_v']) > 0 and not stop_the_robot):
+            #if (closeFlag and SP_edge == (H['e_v'])[-1] and not abort_curr_edge):
             if (closeFlag and SP_edge == (H['e_v'])[-1] and not abort_curr_edge):
+
                 print 'Robot searching in a search point', str(SP_id), '...'
                 print 'SP_edge = ', SP_edge
                 cnt = 0
@@ -513,6 +519,7 @@ def Algorithm_1():
             new_plan_flag = False
             #H = copy.deepcopy(H_new)
             H['e_v'] = copy.deepcopy(H_new['e_v'])
+            #H['e_v'] = list(set(H['e_v']+H_new['e_v'])) #!!!!!!!!!!!!!!!!!!!!!!!!!
             H['e_uv'] = copy.deepcopy(H_new['e_uv'])
             H['e_g'] = copy.deepcopy(H_new['e_g'])
             H['T_a'] = copy.deepcopy(H_new['T_a'])
@@ -576,7 +583,7 @@ if __name__ == '__main__':
     #Vs = Vs[id]/1.1
     #Vd = Vd[id]/1.1
 
-    Vs = [1.5, 1.5, 1.0, 1.5]  # search speeds (rad/s) maximum is pi/2
+    Vs = [1.5, 1.3, 1.0, 1.5]  # search speeds (rad/s) maximum is pi/2
     Vd = [0.4, 0.55, 0.5, 0.4]  # moving speeds (m/s)
     Vs = Vs[id] / 1.0
     Vd = Vd[id] / 1.0

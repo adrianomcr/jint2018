@@ -124,6 +124,7 @@ block( pose [ 2.784 2.411 0.000 0.000 ] name "object" color "white") # SP_id: 55
 #block( pose [ 0.340 6.525 0 0 ] name "object" color "white") # SP_id: 71
 
 
+
 #Set 1
 erratic( pose [7.663 6.063 0.000 -137.868] name "robot_0" color "blue") # node 23
 erratic( pose [2.218 2.678 0.000 -118.171] name "robot_1" color "red") # node 13

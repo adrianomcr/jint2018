@@ -347,6 +347,7 @@ def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, 
     if new_path == 1:
         #if ((len(H['e_uv']) == 0 and not pop_all_edges_flag)):
         if ((len(H['e_uv']) == 0 and not H['popped_edges'])):
+        #if ((len(H['e_uv']) == 0 and not H['popped_edges'])): #Acho que deve ser isso
             #pop_all_edges_flag = True
             H['popped_edges'] = True
             #H['available'] = False
@@ -409,6 +410,7 @@ def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, 
         edge = EdgeMap[i - 1][j - 1]
         # Remove the edge from the list of unvisited nodes
         if edge in H['e_uv']:
+            #print "\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX - "+str(edge)+"\n"
             H['e_uv'].pop(H['e_uv'].index(edge))
             # Add the edge to the list of visited edges
             if not edge in H['e_v']:
@@ -420,8 +422,8 @@ def keep_moving(H, time, time_start, T, pathNode, Hole_path, cx, cy, p, signal, 
                 FILE = open(path, 'a')
                 FILE.write(str(edge)+'\n')
                 FILE.close()
-            if not edge in H['T_f']:
-                H['T_f'].append(edge)
+                if not edge in H['T_f']:
+                    H['T_f'].append(edge)
 
 
         #Print information on screen

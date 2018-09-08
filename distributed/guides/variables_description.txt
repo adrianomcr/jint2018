@@ -18,6 +18,7 @@ pose:
 lastMeeting:
 abort_curr_edge: this bool variable is set True after a replanning 
 available: this bool variable is True when the robot is available for participating in a raplanning. It is False when waitting for finishing an edge and when already popped all nodes
+popped_edges:
 
 
 waitting_new_plan: Bool variable that is true when a robot met someone and is now waiting a new plan

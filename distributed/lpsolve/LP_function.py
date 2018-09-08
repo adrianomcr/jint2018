@@ -184,7 +184,7 @@ def execute_lp(pts,C,cor,PLOT):
 
 
 
-def atribute_clusters(speeds, search_speeds, Cost_cluster_len, Cost_cluster_sp):
+def atribute_clusters(speeds, search_speeds, Cost_cluster_len, Cost_cluster_sp, Cost_cluster_to_go):
 
 
     R = len(speeds)
@@ -199,7 +199,7 @@ def atribute_clusters(speeds, search_speeds, Cost_cluster_len, Cost_cluster_sp):
     C = [[0 for r in Cost_cluster_len] for t in speeds]
     for r in range(R):
         for t in range(T):
-            C[r][t] = Cost_cluster_len[t]/speeds[r] + Cost_cluster_sp[t]/search_speeds[r]
+            C[r][t] = Cost_cluster_len[t]/speeds[r] + Cost_cluster_sp[t]/search_speeds[r] + Cost_cluster_to_go[r][t]/speeds[r]
 
 
     m = R*T

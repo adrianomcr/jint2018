@@ -58,7 +58,8 @@ def read_files():
             break
     #print 'flag = ', flag
     if flag:
-        print '----------  ----------  ----------\nAll edges seached\n----------  ----------  ----------'
+        print '----------  ----------  All edges seached  ----------  ----------'
+        print 'fraction = ', float(len(List_all))/E
         #count_flag = count_flag + 1
         if count_flag % 15 == 0:
             print 'count_flag = ', count_flag

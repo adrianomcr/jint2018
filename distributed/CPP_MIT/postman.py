@@ -344,6 +344,7 @@ def single_chinese_postman_path(graph):
 
 
 
+
 def create_graph(list_tuple):
 
     graph = nx.Graph()
@@ -359,6 +360,7 @@ def create_graph(list_tuple):
         graph.add_edge(start_node, end_node, weight=length, id=e, label=e)
 
     return graph
+
 
 
 
@@ -423,6 +425,12 @@ def main_CPP(list_tuple, start_node):
     #if args.png:
     #    specify_positions(eulerian_graph)
     #    make_png(eulerian_graph, args.png.name)
+
+
+
+
+
+
 
 
 

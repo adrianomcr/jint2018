@@ -479,6 +479,7 @@ def execute_lp(speeds, search_speeds, depots, colors, C, Csp, pts):
         TIMEOUT = 2.0*2  # seconds
     else:
         TIMEOUT = 3.0  # seconds
+    TIMEOUT = 60.0
     lpsolve('set_timeout', lp, TIMEOUT)
     print '\n------------','Here is TIMEOUT', TIMEOUT,'------------\n'
 

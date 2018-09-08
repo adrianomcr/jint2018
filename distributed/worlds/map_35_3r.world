@@ -114,6 +114,14 @@ erratic( pose [1.3 1.4 0.000 -150.261] name "robot_1" color "red") # node 13
 erratic( pose [2.1 2.5 0.000 -163.629] name "robot_2" color "green") # node 33
 
 
+#Set 0X
+#erratic( pose [0.56 10.34 0.000 0.0] name "robot_0" color "blue") # node 1
+#erratic( pose [0.6 0.6 0.000 0.0] name "robot_1" color "red") # node 32
+#erratic( pose [11.2 0.7 0.000 90.0] name "robot_2" color "green") # node 29
+#erratic( pose [0.6 0.6 0.000 0.0] name "robot_0" color "blue") # node 32
+#erratic( pose [4.7 3.5 0.000 0.0] name "robot_1" color "red") # node 17
+#erratic( pose [11.2 0.7 0.000 90.0] name "robot_2" color "green") # node 29
+
 
 #SELECT HERE THE POSITION OF THE TARGET ON STAGE
 #block( pose [ 2.784 2.411 0.000 0.000 ] name "object" color "white") # SP_id: 55

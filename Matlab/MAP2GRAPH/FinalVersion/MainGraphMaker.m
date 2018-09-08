@@ -60,6 +60,11 @@ clc;
 % InputFileImage='MapA1.jpg'; % input image, .jpg or .png
 InputFileImage='MapA2.jpg'; % input image, .jpg or .png
 InputFileImage='MapB1.jpg'; % input image, .jpg or .png
+InputFileImage='MapB2.jpg'; % input image, .jpg or .png
+InputFileImage='MapB3.jpg'; % input image, .jpg or .png
+InputFileImage='MapB4.jpg'; % input image, .jpg or .png
+% InputFileImage='MapB5.jpg'; % input image, .jpg or .png
+% InputFileImage='MapB6.jpg'; % input image, .jpg or .png
 ROBOTRADIUS=12; % Rotot Radius
 
 %Transform pixels to meters for the quadratic form
@@ -68,7 +73,7 @@ resolution = 0.02;
 global SHOWFIGFLAG;
 global SHOWGVDFLAG;
 
-SHOWGVDFLAG=1*0; % to show GVD construction, it takes time
+SHOWGVDFLAG=1; % to show GVD construction, it takes time
 SHOWFIGFLAG=1; % to show output figure
 % ----------------------------------
 
@@ -277,4 +282,7 @@ if MIGUE
     
 end %MIGUE
 
+% Path_l = GRAPH;
+% save('GraphMapB4.mat', 'MeetPoints', 'Path_l')
+% save('GraphMapB5.mat', 'MeetPoints', 'Path_l')
 

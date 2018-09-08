@@ -13,3 +13,4 @@ int16[] lastMeeting
 int16[] Whole_path
 bool abort_curr_edge
 bool available
+bool popped_edges

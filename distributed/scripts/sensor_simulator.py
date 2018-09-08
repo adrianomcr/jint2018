@@ -414,6 +414,7 @@ def sensor_simulator():
 
     state_matrix = [[False for i in range(N)] for j in range(N)]
 
+    sleep(2)
     #sleep(2)
 
 

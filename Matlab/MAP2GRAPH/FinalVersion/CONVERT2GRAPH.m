@@ -17,6 +17,7 @@ map(1,y)=0;
 map(x,y)=0;
 
 [i j]=findfirstppath(map);
+
 if (i==-1)
     disp('first point not found');
     return;
@@ -173,7 +174,22 @@ while(1)
                 j=mpstack(top).y;
             end
             
+%             mpstack
+%             mpstack(top)
+            
             %cleanstack
+%             if (i==0 && j==0)
+%                 mpstack(1)
+%                 mpstack(2)
+%                 mpstack(3)
+%                 mpstack(4)
+%                 mpstack(18)
+%                 mpstack(19)
+%                 mpstack(20)
+%                 top = 1
+%                 i=mpstack(top).x
+%                 j=mpstack(top).y
+%             end
             DelStack(top);
             top=top-1;
             map(i,j)=0;
@@ -181,19 +197,6 @@ while(1)
         else %else if index ==-1 there is no match point in stack
             
             if(searchVer(i,j,vertx) == -1)
-%             if(searchVer(i,j,vertx) == -1)%ADRIANO
-%                 flag_min = 1;
-%                 MIN_DIST = 6;
-%                 for kk = 1:1:length(EdgeLabel)
-%                     if (norm([i,j]-EdgeLabel(kk).Path(1,:)) < MIN_DIST)
-%                         flag_min = 0;
-%                     end
-%                     if (norm([i,j]-EdgeLabel(kk).Path(end,:)) < MIN_DIST)
-%                         flag_min = 0;
-%                     end
-%                 end
-%                 
-%                 if (flag_min == 1)%ADRIANO
 
                     totaliter=totaliter+size(TempPath,1);
                     AddVer2G(i,j,vertexnum,0,totaliter);
@@ -234,7 +237,6 @@ while(1)
                     TempPath=[];
                     pathcounter=1;
                 end % end if, else
-%             end%ADRIANO
          
         end % end if(index ~=-1)
     else %continue the path - if it is not end of the path
@@ -277,7 +279,7 @@ while(1)
     showimg2(i-1:i+1,j-1:j+1)=5;
     
     plot_counter = plot_counter +1;
-    if SHOWGVDFLAG && mod(plot_counter,20) == 0
+    if SHOWGVDFLAG && mod(plot_counter,30) == 0
         imagesc(showimg2); % for showing the matrix as an image
 %         pause(0.0000001);
         drawnow

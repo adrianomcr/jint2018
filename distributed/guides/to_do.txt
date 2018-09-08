@@ -72,6 +72,26 @@ Change the strategy that is now avoidding the robots to communicate after hey po
 
 
 
+!!!!!!!!!!!! TO MONDAY !!!!!!!!!!!!!!!
+It semms that what was done friday is working. Just check it a little bit more
+Decide with Luciano what to do
+
+
+
+Treat the case when there are no edges in the e_uv set
+
+
+
+
+
+
+
+Define the speeds of the robots - done
+
+Check if the robots are searching in the points that are in T_f (now constantly shared)
+
+Include the distance of a cluster in the TA function - done
+
 
 
 
