@@ -167,22 +167,26 @@ def run_expriment():
 
     Whole_path_0 = [11, 9, 10, 9, 8, 7, 72, 7, 8, 12, 11, 12, 13, 45, 13, 14, 15, 29, 30, 31, 30, 32, 30, 29, 28, 42, 43, 42, 18, 17, 38, 20, 38, 37, 39, 37, 36, 22, 36, 2, 1, 2, 3, 4, 3, 28, 27, 33, 27, 26, 34, 26, 24, 25, 24, 23, 35, 23, 22, 21, 40, 21, 20, 19, 41, 19, 18, 17, 16, 44, 16, 15, 14, 5, 4, 73, 4, 5, 6, 7, 6, 61, 60, 66, 60, 59, 67, 59, 57, 58, 57, 56, 68, 69, 68, 70, 68, 56, 55, 63, 62, 61, 62, 65, 62, 63, 64, 63, 55, 51, 52, 53, 52, 54, 52, 51, 47, 48, 49, 48, 50, 48, 47, 46, 71, 46]
 
-
     R = 4
 
-    path = path_0 + "/experiments/timming/" + "exp_A2_" + str(R) + "_robs.txt"
+    #path = path_0 + "/experiments/timming/" + "exp_A2_" + str(R) + "_robs.txt"
     #path = path_0 + "/experiments/timming/" + "exp_A2_x" + str(R) + "_robs.txt"
+    #path = path_0 + "/experiments/heterogeneity/" + "exp_heterogeneity_A2_" + str(R) + "_robs.txt"
+    #path = path_0 + "/experiments/heterogeneity/" + "exp_heterogeneity_A2_x" + str(R) + "_robs.txt"
     FILE_2 = open(path, 'w')
+    """
+    Change inside the TA_Heuristcs.py script the lines:
+        Power_robot_len = speeds
+        Power_robot_sp = search_speeds
+    """
 
 
     for bat in range(1,21,1):
-
 
         list_of_H = []
         print 'list_of_H:\n', list_of_H
 
         for r in range(R):
-
 
             H0 = History()
             IL = Intlist()
@@ -216,10 +220,6 @@ def run_expriment():
 
             #list_of_H.listOfH.append(H0)
             list_of_H.append(H0)
-
-
-
-
 
 
 
@@ -295,6 +295,10 @@ if __name__ == '__main__':
 
     Vs = [1.5, 1.3, 1.0, 1.5]  # search speeds (rad/s) maximum is pi/2
     Vd = [0.4, 0.55, 0.5, 0.4]  # moving speeds (m/s)
+    #Vs = [1.0, 2.5, 4.0, 5.5]  # search speeds (rad/s) maximum is pi/2
+    #Vd = [0.5, 1.5, 2.5, 3.5]  # moving speeds (m/s)
+    Vs = [1.0, 1.5, 2.5, 3.5]  # search speeds (rad/s) maximum is pi/2
+    Vd = [0.5, 1.0, 1.5, 2.5]  # moving speeds (m/s)
     #Vs = Vs[id] / 1.0
     #Vd = Vd[id] / 1.0
 

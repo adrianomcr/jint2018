@@ -77,7 +77,7 @@ def hist():
 
     global freq
     global R, E
-    global List, List_all,List_all_old
+    global List, List_all, List_all_old
     global count_flag
 
     count_flag = 0

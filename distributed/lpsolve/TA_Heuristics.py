@@ -64,7 +64,7 @@ def compute_cluster_costs(graph,pts_id):
 
 
 
-def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id,depots):
+def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id,depots,FILE_2):
 
 
 
@@ -82,14 +82,14 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id,de
     example_colors = ['r','g','b','y','m','c','k','w']
 
     MAX_NUM_CLUSTERS = 2 * R + 5
-    MAX_NUM_CLUSTERS = 2 * R + 3 + 1
+    #MAX_NUM_CLUSTERS = 2 * R + 3 + 1
     #MAX_NUM_CLUSTERS = 6
 
     #PLOT = True
     PLOT = False
 
 
-    count_time = time.time()
+    loop_time = time.time()
     G = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     # for run in range(iterations):
     while len(G) > MAX_NUM_CLUSTERS:
@@ -202,10 +202,12 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id,de
         print '\nHere is temp_cluster: ', temp_cluster, '\n--------------------------------------'
         """
 
-    count_time = time.time() - count_time
+    loop_time = time.time() - loop_time
+    FILE_2.write(str(loop_time))
 
 
     pylab.show()
+
 
     # Define a sort of end flag to identify the top cluster
     n = len(pts)
@@ -216,7 +218,6 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id,de
 
 
     print '\nNumber of iterations: ', iterations
-
 
 
     final_cluster = []
@@ -234,11 +235,21 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id,de
             n_clusters = final_cluster[k][1]
     n_clusters = n_clusters + 1
 
+    print '- - - - - - - - - - loop_time: ', loop_time
+
+
+
     #print 'Here is final cluster:\n', final_cluster
 
     C_edge_len, C_edge_sp = compute_cluster_costs(original_graph, pts_id)
     Power_robot_len = speeds
     Power_robot_sp = search_speeds
+    #Power_robot_len = [1.0 for k in range(len(speeds))]
+    #Power_robot_sp = [1.0 for k in range(len(search_speeds))]
+
+
+    atri_time = time.time()
+
 
 
     Cost_cluster_len = [0 for k in range(n_clusters)] # cost of the length of the cluster
@@ -273,8 +284,12 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id,de
     #sol = LP.atribute_clusters(Power_robot_len,Power_robot_sp, Cost_cluster_len, Cost_cluster_sp)
     sol = LP.atribute_clusters(Power_robot_len,Power_robot_sp, Cost_cluster_len, Cost_cluster_sp, Cost_cluster_to_go)
     # ---------- ---------- ----------
+    #time.sleep(1)
+    atri_time = time.time()-atri_time
+    print '- - - - - - - - - - atri_time', atri_time
 
 
+    FILE_2.write("\t" + str(atri_time))
 
 
     if PLOT:
@@ -288,7 +303,7 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id,de
 
 
 
-    print 'Elapsed time: ', count_time, '\n'
+    #print 'Elapsed time: ', count_time, '\n'
 
 
 
@@ -304,7 +319,7 @@ def heuristic_loop(original_graph, speeds, search_speeds, C, Csp, pts, pts_id,de
                         division[r].append(final_cluster[k][0])
 
 
-    print 'Here is the internal division:\n', division
+    #print 'Here is the internal division:\n', division
 
 
 

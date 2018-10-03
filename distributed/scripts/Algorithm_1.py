@@ -88,6 +88,7 @@ def callback_pose(data):
     return
 # ----------  ----------  ----------  ----------  ----------
 
+
 # Callback routine to obtain the laser information
 def callback_laser(data):
     global laserVec
@@ -171,8 +172,10 @@ def callback_comm_graph(data):
             #Old replanning method
             #change_plan, Hole_path_list, new_Hists = Alg2.replanning(original_graph, virtual_graph, list_of_H)
 
+
+            FILE_2 = open('delete_me.txt', 'w')
             # New (better) replanning method
-            change_plan, Hole_path_list, new_Hists = Alg2.replanning_heuristics(original_graph, virtual_graph, list_of_H)
+            change_plan, Hole_path_list, new_Hists = Alg2.replanning_heuristics(original_graph, virtual_graph, list_of_H, FILE_2)
             # ----------  ----------  ----------  ----------  ----------  ----------  ----------
 
             print 'Tital time of replanning: ', tm.time()-total_time
@@ -201,6 +204,7 @@ def callback_comm_graph(data):
 
     return
 # ----------  ----------  ----------  ----------  ----------
+
 
 # ----------  ----------  ----------  ----------  ----------
 def call_replanning():
@@ -365,6 +369,9 @@ def Algorithm_1():
     elapsed = tm.time()-elapsed
     print 'Elapsed time for CPP: ', elapsed
     # ----------  ----------  ----------  ----------  ----------  ----------  ----------
+
+    #print 'Hole_path: ', Hole_path
+
 
     #Uncomment this section in order to have a deterministic starting route
     """
@@ -587,6 +594,18 @@ if __name__ == '__main__':
     Vd = [0.4, 0.55, 0.5, 0.4]  # moving speeds (m/s)
     Vs = Vs[id] / 1.0
     Vd = Vd[id] / 1.0
+
+    #Vs = [1.5, 2.5, 1.0, 3.5]  # search speeds (rad/s) maximum is pi/2
+    #Vd = [0.5, 1.0, 0.5, 1.5]  # moving speeds (m/s)
+    #Vs = Vs[id] / 1.0
+    #Vd = Vd[id] / 1.0
+
+    #Vs = [1.0, 3.5, 7.0, 0.5]  # search speeds (rad/s) maximum is pi/2
+    #Vd = [0.5, 2.0, 4.0, 0.5]  # moving speeds (m/s)
+    #Vs = Vs[id] / 1.0
+    #Vd = Vd[id] / 1.0
+
+
 
     EXP_NAME = rospy.get_param('EXP_NAME')
 

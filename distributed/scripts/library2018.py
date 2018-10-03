@@ -514,7 +514,7 @@ def get_cost(graph, H, v, vs):
 
     C = max(c)
 
-    return C
+    return C, c
 # ----------  ----------  ----------  ----------  ----------
 
 
