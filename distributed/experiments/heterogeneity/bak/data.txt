@@ -1,0 +1,2 @@
+    Vs = [1.0, 2.5, 4.0, 5.5]  # search speeds (rad/s) maximum is pi/2
+    Vd = [0.5, 1.5, 2.5, 3.5]  # moving speeds (m/s)
