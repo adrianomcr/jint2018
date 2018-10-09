@@ -10,7 +10,7 @@ NAME = '35';
 % NAME = 'A1';
 NAME = 'A2';
 % NAME = 'B1';
-% NAME = 'B4';
+NAME = 'B4';
 % NAME = 'B5';
 % NAME = 'B6';
 
@@ -83,7 +83,7 @@ end % if 0/1
 
 
 %Transform pixels to meters
-resolution = 0.02;
+resolution = 0.02+0.03;
 
 w_s = [0 length(fig(1,:,1)) 0 length(fig(:,1,1))]*resolution;
 axis (w_s)
@@ -279,7 +279,7 @@ CreateSearchPoints
 
 
 %Load the search points files
-M = dlmread(sprintf('./../distributed/maps/Map_%s_SP.txt',NAME));
+M = dlmread(sprintf('./../distributed/maps/Map_exp%s_SP.txt',NAME));
 figure(1)
 hold on
 plot(M(:,1),M(:,2),'go','MarkerSize',12-4,'LineWidth',1.5)

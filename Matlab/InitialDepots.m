@@ -101,6 +101,8 @@ switch (R)
         load('Raffled_depots_4.mat','Raffled_depots')
 end
 
+
+
 % depot = 4;
 clc
 for depot = 1:1:20;
@@ -124,5 +126,32 @@ end
 fprintf('\n')
 end
 fprintf('\n\n\n\n\n')
+
+
+
+
+clc
+fprintf('poses_%d = [\n',R)
+for depot = 1:1:20;
+switch (R)
+    case 1
+        fprintf('[[%.4f, %.4f]],',node_list(Raffled_depots(depot,1),1),node_list(Raffled_depots(depot,1),2))
+    case 2
+        fprintf('[[%.4f, %.4f],',node_list(Raffled_depots(depot,1),1),node_list(Raffled_depots(depot,1),2))
+        fprintf('[%.4f, %.4f]],',node_list(Raffled_depots(depot,2),1),node_list(Raffled_depots(depot,2),2))
+    case 3
+        fprintf('[[%.4f, %.4f],',node_list(Raffled_depots(depot,1),1),node_list(Raffled_depots(depot,1),2))
+        fprintf('[%.4f, %.4f],',node_list(Raffled_depots(depot,2),1),node_list(Raffled_depots(depot,2),2))
+        fprintf('[%.4f, %.4f]],',node_list(Raffled_depots(depot,3),1),node_list(Raffled_depots(depot,3),2))
+    case 4
+        fprintf('[[%.4f, %.4f],',node_list(Raffled_depots(depot,1),1),node_list(Raffled_depots(depot,1),2))
+        fprintf('[%.4f, %.4f],',node_list(Raffled_depots(depot,2),1),node_list(Raffled_depots(depot,2),2))
+        fprintf('[%.4f, %.4f],',node_list(Raffled_depots(depot,3),1),node_list(Raffled_depots(depot,3),2))
+        fprintf('[%.4f, %.4f]],',node_list(Raffled_depots(depot,4),1),node_list(Raffled_depots(depot,4),2))
+end
+fprintf('\n')
+end
+fprintf(']\n\n\n\n\n')
+
 
 

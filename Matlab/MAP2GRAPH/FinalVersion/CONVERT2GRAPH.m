@@ -279,7 +279,7 @@ while(1)
     showimg2(i-1:i+1,j-1:j+1)=5;
     
     plot_counter = plot_counter +1;
-    if SHOWGVDFLAG && mod(plot_counter,30) == 0
+    if SHOWGVDFLAG && mod(plot_counter,50) == 0
         imagesc(showimg2); % for showing the matrix as an image
 %         pause(0.0000001);
         drawnow
